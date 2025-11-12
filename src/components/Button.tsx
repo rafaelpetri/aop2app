@@ -12,7 +12,7 @@ const Wrapper = styled.TouchableOpacity<{ variant: 'primary' | 'secondary' }>`
     variant === 'primary' ? theme.colors.primary : theme.colors.background};
   padding-vertical: ${({ theme }) => theme.spacing.md}px;
   padding-horizontal: ${({ theme }) => theme.spacing.lg}px;
-  height: 48px;
+  min-height: 48px;
   border-radius: ${({ theme }) => theme.radius.md}px;
   border-width: 1px;
   border-color: ${({ theme, variant }) =>

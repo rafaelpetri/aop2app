@@ -10,7 +10,7 @@ const Wrapper = styled.View`
 `;
 
 const Fab = styled.TouchableOpacity`
-  height: 56px;
+  min-height: 56px;
   min-width: 56px;
   padding-horizontal: ${({ theme }) => theme.spacing.md}px;
   border-radius: 28px;
