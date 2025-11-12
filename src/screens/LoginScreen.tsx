@@ -3,6 +3,8 @@ import styled from 'styled-components/native';
 import Input from '../components/Input';
 import Button from '../components/Button';
 import { Ionicons } from '@expo/vector-icons';
+import { get } from '../services/api';
+import { useUser } from '../context/UserContext';
 
 type Props = {
   navigation: any;
@@ -42,9 +44,45 @@ const LinkText = styled.Text`
   text-align: center;
 `;
 
+const ErrorText = styled.Text`
+  color: #D32F2F;
+  text-align: center;
+  margin-top: ${({ theme }) => theme.spacing.sm}px;
+`;
+
 export default function LoginScreen({ navigation, onSignedIn }: Props) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { signIn } = useUser();
+
+  const handleLogin = async () => {
+    const emailTrimmed = email.trim();
+    const passwordTrimmed = password.trim();
+    if (!emailTrimmed || !passwordTrimmed) {
+      setError('Informe e-mail e senha.');
+      return;
+    }
+    try {
+      setLoading(true);
+      setError(null);
+      const users = await get<Array<{ id: string; name: string; email: string; password: string }>>('users', {
+        email: emailTrimmed,
+      });
+      const user = users?.[0];
+      if (user && user.password === passwordTrimmed) {
+        signIn({ id: user.id, name: user.name, email: user.email });
+        onSignedIn();
+      } else {
+        setError('E-mail ou senha inválidos.');
+      }
+    } catch (e) {
+      setError('Erro ao conectar. Tente novamente.');
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <Container>
       <Content>
@@ -54,7 +92,8 @@ export default function LoginScreen({ navigation, onSignedIn }: Props) {
         </LogoBox>
         <Input label="E-mail" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" />
         <Input label="Senha" value={password} onChangeText={setPassword} secureTextEntry />
-        <Button title="Entrar" onPress={onSignedIn} />
+        <Button title={loading ? 'Entrando...' : 'Entrar'} onPress={handleLogin} />
+        {error ? <ErrorText>{error}</ErrorText> : null}
         <Link onPress={() => navigation.navigate('Cadastro')}> 
           <LinkText>Criar conta</LinkText>
         </Link>

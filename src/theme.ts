@@ -6,6 +6,7 @@ const theme = {
     border: '#EEEEEE',
     muted: '#777777',
     success: '#27AE60',
+    warning: '#F2C94C',
   },
   spacing: {
     xs: 4,

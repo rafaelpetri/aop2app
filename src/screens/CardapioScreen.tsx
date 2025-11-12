@@ -3,6 +3,7 @@ import styled from 'styled-components/native';
 import { Ionicons } from '@expo/vector-icons';
 import { categories } from '../data/categories';
 import { FlatList, ListRenderItem } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 const Container = styled.View`
   flex: 1;
@@ -47,8 +48,18 @@ const RightIcon = styled(Ionicons)`
 `;
 
 export default function CardapioScreen() {
+  const navigation = useNavigation<any>();
+
+  const handlePress = (item: typeof categories[number]) => {
+    if (item.name === 'Promoções') {
+      navigation.navigate('Promocoes' as never);
+      return;
+    }
+    navigation.navigate('Produtos' as never, { category: item.name } as never);
+  };
+
   const renderItem: ListRenderItem<typeof categories[number]> = ({ item }) => (
-    <ItemButton activeOpacity={0.85}>
+    <ItemButton activeOpacity={0.85} onPress={() => handlePress(item)}>
       <IconCircle>
         <Ionicons name={item.icon as any} size={22} color="#FF6A00" />
       </IconCircle>

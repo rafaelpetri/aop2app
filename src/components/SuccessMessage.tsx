@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components/native';
 import { Ionicons } from '@expo/vector-icons';
+import { Animated } from 'react-native';
 
 type Props = {
   text: string;
@@ -20,9 +21,28 @@ const Message = styled.Text`
 `;
 
 export default function SuccessMessage({ text }: Props) {
+  const scale = useRef(new Animated.Value(0.9)).current;
+  const opacity = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(opacity, { toValue: 1, duration: 250, useNativeDriver: true }),
+      Animated.timing(scale, { toValue: 1, duration: 250, useNativeDriver: true }),
+    ]).start(() => {
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(scale, { toValue: 1.08, duration: 600, useNativeDriver: true }),
+          Animated.timing(scale, { toValue: 1.0, duration: 600, useNativeDriver: true }),
+        ])
+      ).start();
+    });
+  }, [opacity, scale]);
+
   return (
     <Box>
-      <Ionicons name="checkmark-circle" size={56} color="#27AE60" />
+      <Animated.View style={{ opacity, transform: [{ scale }] }}>
+        <Ionicons name="checkmark-circle" size={56} color="#27AE60" />
+      </Animated.View>
       <Message>{text}</Message>
     </Box>
   );
