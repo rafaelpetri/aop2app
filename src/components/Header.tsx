@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, DrawerActions } from '@react-navigation/native';
 
@@ -41,16 +42,18 @@ const RightSpacer = styled.View`
 export default function Header({ title = '', showMenu = true }: Props) {
   const navigation = useNavigation();
   return (
-    <Bar>
-      {showMenu ? (
-        <MenuButton onPress={() => navigation.dispatch(DrawerActions.openDrawer())}>
-          <Ionicons name="menu" size={24} color="#333" />
-        </MenuButton>
-      ) : (
+    <SafeAreaView edges={["top"]}>
+      <Bar>
+        {showMenu ? (
+          <MenuButton onPress={() => navigation.dispatch(DrawerActions.openDrawer())}>
+            <Ionicons name="menu" size={24} color="#333" />
+          </MenuButton>
+        ) : (
+          <RightSpacer />
+        )}
+        <Title>{title}</Title>
         <RightSpacer />
-      )}
-      <Title>{title}</Title>
-      <RightSpacer />
-    </Bar>
+      </Bar>
+    </SafeAreaView>
   );
 }
