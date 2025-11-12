@@ -1,6 +1,6 @@
 # AOP2 App
 
-Projeto React Native (Expo) baseado no layout fornecido.
+Projeto React Native (Expo) da AOP2 da disciplina Programação para Dispositivos Móveis
 
 ## Tecnologias
 - Expo
