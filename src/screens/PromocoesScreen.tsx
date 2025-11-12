@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components/native';
-import { FlatList, TouchableOpacity } from 'react-native';
+import { Animated, FlatList, TouchableOpacity } from 'react-native';
 import { get } from '../services/api';
 import Button from '../components/Button';
 import { useCart } from '../context/CartContext';
@@ -68,6 +68,11 @@ const Price = styled.Text`
   font-weight: 700;
 `;
 
+const Actions = styled.View`
+  align-items: flex-end;
+  gap: ${({ theme }) => theme.spacing.xs}px;
+`;
+
 export default function PromocoesScreen() {
   type Promo = { id: string; title: string; description: string; price: number; imageUrl?: string; active?: boolean };
   const [items, setItems] = useState<Promo[]>([]);
@@ -91,6 +96,21 @@ export default function PromocoesScreen() {
     })();
   }, []);
 
+  const AnimatedCard = ({ index, children }: { index: number; children: React.ReactNode }) => {
+    const opacity = useRef(new Animated.Value(0)).current;
+    const translateY = useRef(new Animated.Value(8)).current;
+
+    useEffect(() => {
+      const delay = index * 40;
+      Animated.parallel([
+        Animated.timing(opacity, { toValue: 1, duration: 240, delay, useNativeDriver: true }),
+        Animated.timing(translateY, { toValue: 0, duration: 240, delay, useNativeDriver: true }),
+      ]).start();
+    }, [index, opacity, translateY]);
+
+    return <Animated.View style={{ opacity, transform: [{ translateY }] }}>{children}</Animated.View>;
+  };
+
   return (
     <Container>
       {loading && <Text>Carregando...</Text>}
@@ -110,8 +130,9 @@ export default function PromocoesScreen() {
           keyExtractor={(item) => item.id}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingVertical: 4 }}
-          renderItem={({ item }) => (
-            <ItemCard>
+          renderItem={({ item, index }) => (
+            <AnimatedCard index={index}>
+              <ItemCard>
               {isValidImageUrl(item.imageUrl) ? (
                 <Thumb source={{ uri: item.imageUrl }} />
               ) : (
@@ -121,15 +142,19 @@ export default function PromocoesScreen() {
                 <Title>{item.title}</Title>
                 <Description numberOfLines={2}>{item.description}</Description>
               </Info>
-              <Price>{`R$ ${Number(item.price).toFixed(2)}`}</Price>
-              <Button
-                title={item.active === false ? 'Indisponível' : 'Adicionar'}
-                onPress={() =>
-                  addItem({ id: `promo:${item.id}`, name: item.title, price: Number(item.price), imageUrl: item.imageUrl })
-                }
-                disabled={item.active === false}
-              />
-            </ItemCard>
+              <Actions>
+                <Price>{`R$ ${Number(item.price).toFixed(2)}`}</Price>
+                <Button
+                  title={item.active === false ? 'Indisponível' : 'Adicionar'}
+                  variant="secondary"
+                  onPress={() =>
+                    addItem({ id: `promo:${item.id}`, name: item.title, price: Number(item.price), imageUrl: item.imageUrl })
+                  }
+                  disabled={item.active === false}
+                />
+              </Actions>
+              </ItemCard>
+            </AnimatedCard>
           )}
         />
       )}

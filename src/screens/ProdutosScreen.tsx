@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components/native';
-import { FlatList } from 'react-native';
+import { Animated, FlatList } from 'react-native';
 import Button from '../components/Button';
 import { useCart } from '../context/CartContext';
 import { get } from '../services/api';
@@ -133,6 +133,21 @@ export default function ProdutosScreen({ route }: Props) {
     })();
   }, [category]);
 
+  const AnimatedCard = ({ index, children }: { index: number; children: React.ReactNode }) => {
+    const opacity = useRef(new Animated.Value(0)).current;
+    const translateY = useRef(new Animated.Value(8)).current;
+
+    useEffect(() => {
+      const delay = index * 40;
+      Animated.parallel([
+        Animated.timing(opacity, { toValue: 1, duration: 240, delay, useNativeDriver: true }),
+        Animated.timing(translateY, { toValue: 0, duration: 240, delay, useNativeDriver: true }),
+      ]).start();
+    }, [index, opacity, translateY]);
+
+    return <Animated.View style={{ opacity, transform: [{ translateY }] }}>{children}</Animated.View>;
+  };
+
   return (
     <Container>
       {loading && <Text>Carregando...</Text>}
@@ -143,8 +158,9 @@ export default function ProdutosScreen({ route }: Props) {
           keyExtractor={(item) => item.id}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingVertical: 4 }}
-          renderItem={({ item }) => (
-            <ItemCard>
+          renderItem={({ item, index }) => (
+            <AnimatedCard index={index}>
+              <ItemCard>
               {isValidImageUrl(item.imageUrl) ? (
                 <Thumb source={{ uri: item.imageUrl }} />
               ) : (
@@ -186,7 +202,8 @@ export default function ProdutosScreen({ route }: Props) {
                   <Button title="Indisponível" variant="secondary" disabled />
                 )}
               </Actions>
-            </ItemCard>
+              </ItemCard>
+            </AnimatedCard>
           )}
         />
       )}

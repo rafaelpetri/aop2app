@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import styled from 'styled-components/native';
-import { TouchableOpacityProps } from 'react-native';
+import { Animated, TouchableOpacityProps } from 'react-native';
 
 type Props = TouchableOpacityProps & {
   title: string;
@@ -28,10 +28,31 @@ const Label = styled.Text<{ variant: 'primary' | 'secondary' }>`
   font-weight: 600;
 `;
 
-export default function Button({ title, variant = 'primary', ...rest }: Props) {
+export default function Button({ title, variant = 'primary', onPressIn, onPressOut, ...rest }: Props) {
+  const scale = useRef(new Animated.Value(1)).current;
+
+  const handlePressIn: TouchableOpacityProps['onPressIn'] = (e) => {
+    Animated.spring(scale, { toValue: 0.97, useNativeDriver: true, speed: 20, bounciness: 0 }).start();
+    onPressIn && onPressIn(e as any);
+  };
+
+  const handlePressOut: TouchableOpacityProps['onPressOut'] = (e) => {
+    Animated.spring(scale, { toValue: 1, useNativeDriver: true, speed: 20, bounciness: 0 }).start();
+    onPressOut && onPressOut(e as any);
+  };
+
+  const AnimatedWrapper = Animated.createAnimatedComponent(Wrapper);
+
   return (
-    <Wrapper variant={variant} activeOpacity={0.8} {...rest}>
+    <AnimatedWrapper
+      variant={variant}
+      activeOpacity={0.8}
+      {...rest}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
+      style={{ transform: [{ scale }] }}
+    >
       <Label variant={variant}>{title}</Label>
-    </Wrapper>
+    </AnimatedWrapper>
   );
 }

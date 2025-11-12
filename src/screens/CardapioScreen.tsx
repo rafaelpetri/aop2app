@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components/native';
 import { Ionicons } from '@expo/vector-icons';
 import { categories } from '../data/categories';
-import { FlatList, ListRenderItem } from 'react-native';
+import { Animated, FlatList, ListRenderItem } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 const Container = styled.View`
@@ -49,6 +49,15 @@ const RightIcon = styled(Ionicons)`
 
 export default function CardapioScreen() {
   const navigation = useNavigation<any>();
+  const opacity = useRef(new Animated.Value(0)).current;
+  const translateY = useRef(new Animated.Value(8)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(opacity, { toValue: 1, duration: 260, useNativeDriver: true }),
+      Animated.timing(translateY, { toValue: 0, duration: 260, useNativeDriver: true }),
+    ]).start();
+  }, [opacity, translateY]);
 
   const handlePress = (item: typeof categories[number]) => {
     if (item.name === 'Promoções') {
@@ -70,16 +79,18 @@ export default function CardapioScreen() {
 
   return (
     <Container>
-      <ListWrapper>
-        <FlatList
-          data={categories}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id}
-          ItemSeparatorComponent={() => null}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingVertical: 4 }}
-        />
-      </ListWrapper>
+      <Animated.View style={{ opacity, transform: [{ translateY }], flex: 1 }}>
+        <ListWrapper>
+          <FlatList
+            data={categories}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id}
+            ItemSeparatorComponent={() => null}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingVertical: 4 }}
+          />
+        </ListWrapper>
+      </Animated.View>
     </Container>
   );
 }
