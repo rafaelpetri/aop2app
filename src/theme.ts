@@ -1,12 +1,17 @@
+import { Platform } from 'react-native';
+
 const theme = {
   colors: {
-    primary: '#FF6A00',
-    text: '#333333',
-    background: '#FFFFFF',
-    border: '#EEEEEE',
+    primary: '#FF6B00',
+    secondary: '#263238',
+    text: '#263238',
+    background: '#FAFAFA',
+    border: '#E0E0E0',
     muted: '#777777',
-    success: '#27AE60',
-    warning: '#F2C94C',
+    success: '#2ECC71',
+    error: '#E74C3C',
+    accent: '#FFD166',
+    warning: '#FFD166',
   },
   spacing: {
     xs: 4,
@@ -25,9 +30,9 @@ const theme = {
     xs: 12,
     sm: 14,
     md: 16,
-    lg: 18,
-    xl: 22,
-    xxl: 28,
+    lg: 24,
+    xl: 28,
+    xxl: 32,
   },
   lineHeight: {
     tight: 1.2,
@@ -35,9 +40,9 @@ const theme = {
     relaxed: 1.6,
   },
   fonts: {
-    regular: 'System',
-    medium: 'System',
-    bold: 'System',
+    regular: Platform.OS === 'android' ? 'Roboto' : 'System',
+    medium: Platform.OS === 'android' ? 'Roboto' : 'System',
+    bold: Platform.OS === 'android' ? 'Roboto' : 'System',
   },
 };
 

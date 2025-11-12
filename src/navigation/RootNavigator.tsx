@@ -14,14 +14,16 @@ import AcompanharScreen from '../screens/AcompanharScreen';
 import PromocoesScreen from '../screens/PromocoesScreen';
 import ProdutosScreen from '../screens/ProdutosScreen';
 import FloatingCart from '../components/FloatingCart';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
 
 function AppDrawer() {
+  const insets = useSafeAreaInsets();
   return (
     <>
-      <Drawer.Navigator drawerContent={() => <MenuDrawer />}> 
+      <Drawer.Navigator drawerContent={() => <MenuDrawer />} sceneContainerStyle={{ paddingBottom: insets.bottom }}>
         <Drawer.Screen name="Cardapio" component={CardapioScreen} options={{ header: () => <Header title="Cardápio" /> }} />
         <Drawer.Screen name="Pedido" component={PedidoScreen} options={{ header: () => <Header title="Pedido" /> }} />
         <Drawer.Screen name="Acompanhar" component={AcompanharScreen} options={{ header: () => <Header title="Acompanhar" /> }} />
@@ -34,8 +36,9 @@ function AppDrawer() {
 }
 
 function AuthStack({ onSignedIn }: { onSignedIn: () => void }) {
+  const insets = useSafeAreaInsets();
   return (
-    <Stack.Navigator>
+    <Stack.Navigator screenOptions={{ contentStyle: { paddingBottom: insets.bottom } }}>
       <Stack.Screen name="Login" options={{ headerShown: false }}>
         {(props) => <LoginScreen {...props} onSignedIn={onSignedIn} />}
       </Stack.Screen>

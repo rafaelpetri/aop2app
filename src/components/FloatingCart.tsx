@@ -2,6 +2,8 @@ import React from 'react';
 import styled from 'styled-components/native';
 import { useNavigation } from '@react-navigation/native';
 import { useCart } from '../context/CartContext';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTheme } from 'styled-components/native';
 
 const Wrapper = styled.View`
   position: absolute;
@@ -47,13 +49,15 @@ const BadgeText = styled.Text`
 export default function FloatingCart() {
   const navigation = useNavigation();
   const { items } = useCart();
+  const insets = useSafeAreaInsets();
+  const theme = useTheme();
 
   const count = items.reduce((sum, i) => sum + i.qty, 0);
 
   if (count === 0) return null;
 
   return (
-    <Wrapper pointerEvents="box-none">
+    <Wrapper pointerEvents="box-none" style={{ bottom: insets.bottom + theme.spacing.lg }}>
       <Fab activeOpacity={0.85} onPress={() => navigation.navigate('Pedido' as never)}>
         <Label>Carrinho</Label>
         <Badge>
