@@ -4,6 +4,8 @@ import { Animated, FlatList } from 'react-native';
 import Button from '../components/Button';
 import { useCart } from '../context/CartContext';
 import { get } from '../services/api';
+import { Picker } from '@react-native-picker/picker';
+import { categories } from '../data/categories';
 
 type Props = {
   route?: { params?: { category?: string } };
@@ -22,6 +24,15 @@ const Container = styled.View`
   flex: 1;
   background-color: ${({ theme }) => theme.colors.background};
   padding: ${({ theme }) => theme.spacing.lg}px;
+`;
+
+const FilterBar = styled.View`
+  border-width: 1px;
+  border-color: ${({ theme }) => theme.colors.border};
+  border-radius: ${({ theme }) => theme.radius.sm}px;
+  margin-bottom: ${({ theme }) => theme.spacing.md}px;
+  overflow: hidden;
+  background-color: ${({ theme }) => theme.colors.background};
 `;
 
 const ItemCard = styled.View`
@@ -103,11 +114,12 @@ const Text = styled.Text`
 `;
 
 export default function ProdutosScreen({ route }: Props) {
-  const category = route?.params?.category ?? '';
+  const initialCategory = route?.params?.category ?? '';
   const [items, setItems] = useState<Produto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { items: cartItems, addItem, incrementQty, decrementQty } = useCart();
+  const [selectedCategory, setSelectedCategory] = useState<string>(initialCategory);
 
   const isValidImageUrl = (u?: string) => !!u && /^https?:\/\//i.test(u);
 
@@ -119,10 +131,10 @@ export default function ProdutosScreen({ route }: Props) {
         let data: Produto[] = [];
         // Tenta filtrar pelo servidor; se falhar, busca tudo e filtra localmente
         try {
-          data = await get<Produto[]>('produtos', category ? { category } : undefined);
+          data = await get<Produto[]>('produtos', selectedCategory ? { category: selectedCategory } : undefined);
         } catch {
           const all = await get<Produto[]>('produtos');
-          data = category ? all.filter((p) => p.category === category) : all;
+          data = selectedCategory ? all.filter((p) => p.category === selectedCategory) : all;
         }
         setItems(data);
       } catch (e) {
@@ -131,7 +143,7 @@ export default function ProdutosScreen({ route }: Props) {
         setLoading(false);
       }
     })();
-  }, [category]);
+  }, [selectedCategory]);
 
   const AnimatedCard = ({ index, children }: { index: number; children: React.ReactNode }) => {
     const opacity = useRef(new Animated.Value(0)).current;
@@ -150,6 +162,17 @@ export default function ProdutosScreen({ route }: Props) {
 
   return (
     <Container>
+      <FilterBar>
+        <Picker
+          selectedValue={selectedCategory}
+          onValueChange={(value) => setSelectedCategory(String(value))}
+        >
+          <Picker.Item label="Todas as categorias" value="" />
+          {categories.filter((c) => c.name !== 'Promoções').map((c) => (
+            <Picker.Item key={c.id} label={c.name} value={c.name} />
+          ))}
+        </Picker>
+      </FilterBar>
       {loading && <Text>Carregando...</Text>}
       {!loading && error && <Text>{error}</Text>}
       {!loading && !error && (
