@@ -18,13 +18,36 @@ const Title = styled.Text`
   margin-bottom: ${({ theme }) => theme.spacing.md}px;
 `;
 
+const ErrorText = styled.Text`
+  color: ${({ theme }) => theme.colors.error};
+  margin-bottom: ${({ theme }) => theme.spacing.sm}px;
+`;
+
 export default function NovaSenhaScreen({ navigation }: Props) {
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
   return (
     <Container>
       <Title>Nova senha</Title>
       <Input label="Nova senha" secureTextEntry value={password} onChangeText={setPassword} />
-      <Button title="Confirmar" onPress={() => navigation.navigate('SenhaAlterada')} />
+      <Input label="Confirmar nova senha" secureTextEntry value={confirmPassword} onChangeText={setConfirmPassword} />
+      {error ? <ErrorText>{error}</ErrorText> : null}
+      <Button
+        title="Confirmar"
+        onPress={() => {
+          if (!password || !confirmPassword) {
+            setError('Preencha todos os campos.');
+            return;
+          }
+          if (password !== confirmPassword) {
+            setError('As senhas não conferem.');
+            return;
+          }
+          setError(null);
+          navigation.navigate('SenhaAlterada');
+        }}
+      />
     </Container>
   );
 }
